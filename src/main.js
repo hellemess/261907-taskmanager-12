@@ -1,191 +1,32 @@
-'use strict';
+import {getMenuTemplate} from './view/menu';
+import {getFilterTemplate} from './view/filter';
+import {getBoardTemplate} from './view/board';
+import {getSortingTemplate} from './view/sorting';
+import {getTaskEditTemplate} from './view/task-edit';
+import {getTaskTemplate} from './view/task';
+import {getLoadButtonTemplate} from './view/load-button';
 
 const TASKS_COUNT = 3;
 
-const mainElement = document.querySelector( `.main` );
-const controlsElement = mainElement.querySelector( `.main__control` );
+const mainElement = document.querySelector(`.main`);
+const controlsElement = mainElement.querySelector(`.main__control`);
 
 const render = (container, position, template) => {
   container.insertAdjacentHTML(position, template);
 };
 
-const createControlsTemplate = () => 
-  `<section class="control__btn-wrap">
-    <input type="radio" name="control" id="control__new-task" class="control__input visually-hidden" />
-    <label for="control__new-task" class="control__label control__label--new-task">+ ADD NEW TASK</label>
-    <input type="radio" name="control" id="control__task" class="control__input visually-hidden" checked />
-    <label for="control__task" class="control__label">TASKS</label>
-    <input type="radio" name="control" id="control__statistic" class="control__input visually-hidden" />
-    <label for="control__statistic" class="control__label">STATISTICS</label>
-  </section>`;
+render(controlsElement, `beforeend`, getMenuTemplate());
+render(mainElement, `beforeend`, getFilterTemplate());
+render(mainElement, `beforeend`, getBoardTemplate());
 
-const createFiltersTemplate = () => 
-  `<section class="main__filter filter container">
-    <input type="radio" id="filter__all" class="filter__input visually-hidden" name="filter" checked />
-    <label for="filter__all" class="filter__label">
-      All 
-      <span class="filter__all-count">13</span>
-    </label>
-    <input type="radio" id="filter__overdue" class="filter__input visually-hidden" name="filter" disabled />
-    <label for="filter__overdue" class="filter__label">
-      Overdue 
-      <span class="filter__overdue-count">0</span>
-    </label>
-    <input type="radio" id="filter__today" class="filter__input visually-hidden" name="filter" disabled />
-    <label for="filter__today" class="filter__label">
-      Today 
-      <span class="filter__today-count">0</span>
-    </label>
-    <input type="radio" id="filter__favorites" class="filter__input visually-hidden" name="filter" />
-    <label for="filter__favorites" class="filter__label">
-      Favorites 
-      <span class="filter__favorites-count">1</span>
-    </label>
-    <input type="radio id="filter__repeating" class="filter__input visually-hidden" name="filter" />
-    <label for="filter__repeating" class="filter__label">
-      Repeating 
-      <span class="filter__repeating-count">1</span>
-    </label>
-    <input type="radio" id="filter__archive" class="filter__input visually-hidden" name="filter" />
-    <label for="filter__archive" class="filter__label">
-      Archive 
-      <span class="filter__archive-count">115</span>
-    </label>
-  </section>`;
+const boardElement = mainElement.querySelector(`.board`);
+const tasksListElement = boardElement.querySelector(`.board__tasks`);
 
-const createBoardTemplate = () =>
-  `<section class="board container">
-    <div class="board__tasks"></div>
-  </section>`;
-
-const createSortingTemplate = () => 
-  `<div class="board__filter-list">
-    <a href="#" class="board__filter" data-sort-type="default">SORT BY DEFAULT</a>
-    <a href="#" class="board__filter" data-sort-type="date-up">SORT BY DATE up</a>
-    <a href="#" class="board__filter" data-sort-type="date-down">SORT BY DATE down</a>
-  </div>`;
-
-const createTaskTemplate = () => 
-  `<article class="card card--black">
-    <div class="card__form">
-      <div class="card__inner">
-        <div class="card__control">
-          <button type="button" class="card__btn card__btn--edit">edit</button>
-          <button type="button" class="card__btn card__btn--archive">archive</button>
-          <button type="button" class="card__btn card__btn--favorites card__btn--disabled">favorites</button>
-        </div>
-        <div class="card__color-bar">
-          <svg class="card__color-bar-wave" width="100%" height="10">
-            <use xlink:href="#wave"></use>
-          </svg>
-        </div>
-        <div class="card__textarea-wrap">
-          <p class="card__text">Example task with default color.</p>
-        </div>
-        <div class="card__settings">
-          <div class="card__details">
-            <div class="card__dates">
-              <div class="card__date-deadline">
-                <p class="card__input-deadline-wrap">
-                  <span class="card__date">23 September</span>
-                  <span class="card__time">16:15</span>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </article>`;
-
-const createEditTemplate = () => 
-  `<article class="card card--edit card--yellow card--repeat">
-    <form class="card__form" method="get">
-      <div class="card__inner">
-        <div class="card__color-bar">
-          <svg class="card__color-bar-wave" width="100%" height="10">
-            <use xlink:href="#wave"></use>
-          </svg>
-        </div>
-        <div class="card__textarea-wrap">
-          <label>
-            <textarea class="card__text" placeholder="Start typing your text here..." name="text">Here is a card with filled data</textarea>
-          </label>
-        </div>
-        <div class="card__settings">
-          <div class="card__details">
-            <div class="card__dates">
-              <button class="card__date-deadline-toggle" type="button">
-                date: 
-                <span class="card__date-status">yes</span>
-              </button>
-              <fieldset class="card__date-deadline">
-                <label class="card__input-deadline-wrap">
-                  <input class="card__date" type="text" placeholder="" name="date" value="23 September 16:15" />
-                </label>
-              </fieldset>
-              <button class="card__repeat-toggle" type="button">
-                repeat: 
-                <span class="card__repeat-status">yes</span>
-              </button>
-              <fieldset class="card__repeat-days">
-                <div class="card__repeat-days-inner">
-                  <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-mo-4" name="repeat" value="mo" />
-                  <label class="card__repeat-day" for="repeat-mo-4">mo</label>
-                  <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-tu-4" name="repeat" value="tu" />
-                  <label class="card__repeat-day" for="repeat-tu-4">tu</label>
-                  <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-we-4" name="repeat" value="we" />
-                  <label class="card__repeat-day" for="repeat-we-4">we</label>
-                  <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-th-4" name="repeat" value="th" />
-                  <label class="card__repeat-day" for="repeat-th-4">th</label>
-                  <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-fr-4" name="repeat" value="fr" />
-                  <label class="card__repeat-day" for="repeat-fr-4">fr</label>
-                  <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-sa-4" name="repeat" value="sa" />
-                  <label class="card__repeat-day" for="repeat-sa-4">sa</label>
-                  <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-su-4" name="repeat" value="su" />
-                  <label class="card__repeat-day" for="repeat-su-4">su</label>
-                </div>
-              </fieldset>
-            </div>
-          </div>
-          <div class="card__colors-inner">
-            <h3 class="card__colors-title">Color</h3>
-            <div class="card__colors-wrap">
-              <input type="radio" id="color-black-4" class="card__color-input card__color-input--black visually-hidden" name="color" value="black" />
-              <label for="color-black-4" class="card__color card__color--black">black</label>
-              <input type="radio" id="color-yellow-4" class="card__color-input card__color-input--yellow visually-hidden" name="color" value="yellow" />
-              <label for="color-yellow-4" class="card__color card__color--yellow">yellow</label>
-              <input type="radio" id="color-blue-4" class="card__color-input card__color-input--blue visually-hidden" name="color" value="blue" />
-              <label for="color-blue-4" class="card__color card__color--blue">blue</label>
-              <input type="radio" id="color-green-4" class="card__color-input card__color-input--green visually-hidden" name="color" value="green" />
-              <label for="color-green-4" class="card__color card__color--green">green</label>
-              <input type="radio" id="color-pink-4" class="card__color-input card__color-input--pink visually-hidden" name="color" value="pink" />
-              <label for="color-pink-4" class="card__color card__color--pink">pink</label>
-            </div>
-          </div>
-        </div>
-        <div class="card__status-btns">
-          <button class="card__save" type="submit">save</button>
-          <button class="card__delete" type="button">delete</button>
-        </div>
-      </div>
-    </form>
-  </article>`;
-
-const createLoadButtonTemplate = () => `<button class="load-more" type="button">load more</button>`;
-
-render(controlsElement, `beforeend`, createControlsTemplate());
-render(mainElement, `beforeend`, createFiltersTemplate());
-render(mainElement, `beforeend`, createBoardTemplate());
-
-const boardElement = mainElement.querySelector( `.board` );
-const tasksListElement = boardElement.querySelector( `.board__tasks` );
-
-render(boardElement, `afterbegin`, createSortingTemplate());
-render(tasksListElement, `beforeend`, createEditTemplate());
+render(boardElement, `afterbegin`, getSortingTemplate());
+render(tasksListElement, `beforeend`, getTaskEditTemplate());
 
 for (let i = 0; i < TASKS_COUNT; i++) {
-  render(tasksListElement, `beforeend`, createTaskTemplate());
+  render(tasksListElement, `beforeend`, getTaskTemplate());
 }
 
-render(boardElement, `beforeend`, createLoadButtonTemplate());
+render(boardElement, `beforeend`, getLoadButtonTemplate());
