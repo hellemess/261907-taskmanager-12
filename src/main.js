@@ -20,6 +20,30 @@ const render = (container, position, template) => {
   container.insertAdjacentHTML(position, template);
 };
 
+const createLoadButton = (container) => {
+  if ( renderedTasksCount >= tasks,length )
+  {
+    return null;
+  }
+
+  render(container, `beforeend`, getLoadButtonTemplate());
+
+  return container.querySelector(`.load-more`)
+};
+
+const loadMore = (container) => {
+  tasks
+    .slice(renderedTasksCount, renderedTasksCount + TASKS_COUNT_PER_STEP)
+    .forEach((task) => render(container, `beforeend`, getTaskTemplate(task)));
+
+  renderedTasksCount += TASKS_COUNT_PER_STEP;
+
+  if (renderedTasksCount >= tasks.length)
+  {
+    loadButton.remove();
+  }
+};
+
 render(controlsElement, `beforeend`, getMenuTemplate());
 render(mainElement, `beforeend`, getFilterTemplate(filter));
 render(mainElement, `beforeend`, getBoardTemplate());
@@ -34,26 +58,14 @@ for (let i = 1; i < Math.min(tasks.length, TASKS_COUNT_PER_STEP); i++) {
   render(tasksListElement, `beforeend`, getTaskTemplate(tasks[i]));
 }
 
-if (tasks.length > TASKS_COUNT_PER_STEP)
+let renderedTasksCount = TASKS_COUNT_PER_STEP;
+
+const loadButton = createLoadButton(boardElement);
+
+if ( loadButton !== null )
 {
-  let renderedTasksCount = TASKS_COUNT_PER_STEP;
-  
-  render(boardElement, `beforeend`, getLoadButtonTemplate());
-
-  const loadButton = boardElement.querySelector(`.load-more`);
-
-  loadButton.addEventListener(`click`, (evt) => {
+  loadButton.addEventListener('click', (evt) => {
     evt.preventDefault();
-
-    tasks
-      .slice(renderedTasksCount, renderedTasksCount + TASKS_COUNT_PER_STEP)
-      .forEach((task) => render(tasksListElement, `beforeend`, getTaskTemplate(task)));
-    
-    renderedTasksCount += TASKS_COUNT_PER_STEP;
-
-    if (renderedTasksCount >= tasks.length)
-    {
-      loadButton.remove();
-    }
+    loadMore(tasksListElement);
   });
 }
