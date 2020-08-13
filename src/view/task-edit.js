@@ -1,5 +1,20 @@
 import {COLORS} from '../const';
-import {formatDate, isExpired, isRepeating} from '../utils';
+import {createElement, formatDate, isExpired, isRepeating} from '../utils';
+
+const BLANK_TASK = {
+  description: ``,
+  dueDate: null,
+  repeatingDays: {
+    mo: false,
+    tu: false,
+    we: false,
+    th: false,
+    fr: false,
+    sa: false,
+    su: false
+  },
+  color: `black`
+};
 
 const getTaskEditColorTemplate = (currentColor) =>
   `${COLORS.map((color) =>
@@ -36,21 +51,8 @@ const getTaskEditRepeatingTemplate = (repeatingDays) =>
     </fieldset>`
     : ``}`;
 
-export const getTaskEditTemplate = (task = {}) => {
-  const {
-    description = ``,
-    dueDate = null,
-    repeatingDays = {
-      mo: false,
-      tu: false,
-      we: false,
-      th: false,
-      fr: false,
-      sa: false,
-      su: false
-    },
-    color = `black`
-  } = task;
+const getTaskEditTemplate = (task) => {
+  const {description, dueDate, repeatingDays, color} = task;
 
   const classDeadline = isExpired(dueDate)
     ? `card--deadline`
@@ -99,3 +101,26 @@ export const getTaskEditTemplate = (task = {}) => {
     </form>
   </article>`;
 };
+
+export default class TaskEditView {
+  constructor(task = BLANK_TASK) {
+    this._element = null;
+    this._task = task;
+  }
+
+  get element() {
+    if (!this._element) {
+      this._element = createElement(this.template);
+    }
+
+    return this._element;
+  }
+
+  get template() {
+    return getTaskEditTemplate(this._task);
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

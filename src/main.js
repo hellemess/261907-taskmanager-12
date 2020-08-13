@@ -1,12 +1,14 @@
 import {generateTask} from './mock/task';
 import {generateFilter} from './mock/filter';
-import {getMenuTemplate} from './view/menu';
-import {getFilterTemplate} from './view/filter';
-import {getBoardTemplate} from './view/board';
-import {getSortingTemplate} from './view/sorting';
-import {getTaskEditTemplate} from './view/task-edit';
-import {getTaskTemplate} from './view/task';
-import {getLoadButtonTemplate} from './view/load-button';
+import {RenderPosition, render} from './utils';
+import MenuView from './view/menu';
+import FilterView from './view/filter';
+import BoardView from './view/board';
+import TasksListView from './view/tasks-list';
+import SortingView from './view/sorting';
+import TaskEditView from './view/task-edit';
+import TaskView from './view/task';
+import LoadButtonView from './view/load-button';
 
 const TASKS_COUNT = 23;
 const TASKS_COUNT_PER_STEP = 8;
@@ -16,56 +18,59 @@ const filter = generateFilter(tasks);
 const mainElement = document.querySelector(`.main`);
 const controlsElement = mainElement.querySelector(`.main__control`);
 
-const render = (container, position, template) => {
-  container.insertAdjacentHTML(position, template);
-};
+const loadMore = (evt) => {
+  evt.preventDefault();
 
-const createLoadButton = (container) => {
-  if ( renderedTasksCount >= tasks,length )
-  {
-    return null;
-  }
-
-  render(container, `beforeend`, getLoadButtonTemplate());
-
-  return container.querySelector(`.load-more`)
-};
-
-const loadMore = (container) => {
   tasks
     .slice(renderedTasksCount, renderedTasksCount + TASKS_COUNT_PER_STEP)
-    .forEach((task) => render(container, `beforeend`, getTaskTemplate(task)));
+    .forEach((task) => renderTask(tasksList.element, task));
 
   renderedTasksCount += TASKS_COUNT_PER_STEP;
 
   if (renderedTasksCount >= tasks.length)
   {
-    loadButton.remove();
+    evt.target.remove();
   }
 };
 
-render(controlsElement, `beforeend`, getMenuTemplate());
-render(mainElement, `beforeend`, getFilterTemplate(filter));
-render(mainElement, `beforeend`, getBoardTemplate());
+const renderTask = (container, task) => {
+  const taskCard = new TaskView(task);
+  const taskEdit = new TaskEditView(task);
 
-const boardElement = mainElement.querySelector(`.board`);
-const tasksListElement = boardElement.querySelector(`.board__tasks`);
+  const replaceCardToForm = () => {
+    container.replaceChild(taskEdit.element, taskCard.element);
+  }
 
-render(boardElement, `afterbegin`, getSortingTemplate());
-render(tasksListElement, `beforeend`, getTaskEditTemplate(tasks[0]));
+  const replaceFormToCard = (evt) => {
+    evt.preventDefault();
+    container.replaceChild(taskCard.element, taskEdit.element);
+  }
 
-for (let i = 1; i < Math.min(tasks.length, TASKS_COUNT_PER_STEP); i++) {
-  render(tasksListElement, `beforeend`, getTaskTemplate(tasks[i]));
+  taskCard.element.querySelector(`.card__btn--edit`).addEventListener('click', replaceCardToForm);
+  taskEdit.element.querySelector(`form`).addEventListener(`submit`, replaceFormToCard);
+  render(container, RenderPosition.BEFOREEND, taskCard.element);
+}
+
+render(controlsElement, RenderPosition.BEFOREEND, new MenuView().element);
+render(mainElement, RenderPosition.BEFOREEND, new FilterView(filter).element);
+
+const board = new BoardView();
+const tasksList = new TasksListView();
+
+render(mainElement, RenderPosition.BEFOREEND, board.element);
+render(board.element, RenderPosition.BEFOREEND, new SortingView().element);
+render(board.element, RenderPosition.BEFOREEND, tasksList.element);
+
+for (let i = 0; i < Math.min(tasks.length, TASKS_COUNT_PER_STEP); i++) {
+  renderTask(tasksList.element, tasks[i]);
 }
 
 let renderedTasksCount = TASKS_COUNT_PER_STEP;
 
-const loadButton = createLoadButton(boardElement);
-
-if ( loadButton !== null )
+if ( renderedTasksCount < tasks.length )
 {
-  loadButton.addEventListener('click', (evt) => {
-    evt.preventDefault();
-    loadMore(tasksListElement);
-  });
+  const loadButton = new LoadButtonView();
+
+  render(board.element, RenderPosition.BEFOREEND, loadButton.element);
+  loadButton.element.addEventListener('click', loadMore);
 }
