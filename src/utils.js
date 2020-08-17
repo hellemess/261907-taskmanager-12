@@ -1,3 +1,18 @@
+export const RenderPosition = {
+  BEFOREBEGIN: `beforebegin`,
+  BEFOREEND: `beforeend`,
+  AFTERBEGIN: `afterbegin`,
+  AFTEREND: `afterend`
+};
+
+export const createElement = (template) => {
+  const element = document.createElement(`div`);
+
+  element.innerHTML = template;
+
+  return element.firstChild;
+}
+
 export const formatDate = (date) => date.toLocaleString(`en-US`, {day: `numeric`, month: `long`});
 
 export const getRandomArrayValue = (array) => {
@@ -40,3 +55,20 @@ export const isExpiringToday = (dueDate) => {
 }
 
 export const isRepeating = (repeatingDays) => Object.values(repeatingDays).some(Boolean);
+
+export const render = (container, position, element) => {
+  switch (position) {
+    case RenderPosition.BEFOREBEGIN:
+      container.before(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+      break;
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.AFTEREND:
+      container,after(element);
+      break;
+  }
+};
