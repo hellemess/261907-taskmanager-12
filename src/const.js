@@ -5,3 +5,8 @@ export const COLORS = [
   `green`,
   `pink`
 ];
+
+export const KeyCodes = {
+  ENTER: 13,
+  ESC: 27
+};
