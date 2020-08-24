@@ -11,7 +11,7 @@ export const createElement = (template) => {
   element.innerHTML = template;
 
   return element.firstChild;
-}
+};
 
 export const formatDate = (date) => date.toLocaleString(`en-US`, {day: `numeric`, month: `long`});
 
@@ -29,8 +29,7 @@ export const getRandomInteger = (a = 0, b = 1) => {
 };
 
 export const isExpired = (dueDate) => {
-  if (dueDate === null)
-  {
+  if (dueDate === null) {
     return false;
   }
 
@@ -42,8 +41,7 @@ export const isExpired = (dueDate) => {
 };
 
 export const isExpiringToday = (dueDate) => {
-  if (dueDate === null)
-  {
+  if (dueDate === null) {
     return false;
   }
 
@@ -52,7 +50,7 @@ export const isExpiringToday = (dueDate) => {
   currentDate.setHours(23, 59, 59, 999);
 
   return currentDate.getTime() === dueDate.getTime();
-}
+};
 
 export const isRepeating = (repeatingDays) => Object.values(repeatingDays).some(Boolean);
 
@@ -68,7 +66,7 @@ export const render = (container, position, element) => {
       container.prepend(element);
       break;
     case RenderPosition.AFTEREND:
-      container,after(element);
+      container.after(element);
       break;
   }
 };
