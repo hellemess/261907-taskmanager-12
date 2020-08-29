@@ -1,18 +1,6 @@
-import {createElement} from '../utils';
+import AbstractView from './abstract';
 
-export default class MenuView {
-  constructor() {
-    this._element = null;
-  }
-
-  get element() {
-    if (!this._element) {
-      this._element = createElement(this.template);
-    }
-
-    return this._element;
-  }
-
+export default class MenuView extends AbstractView {
   get template() {
     return `<section class="control__btn-wrap">
         <input type="radio" name="control" id="control__new-task" class="control__input visually-hidden" />
@@ -22,9 +10,5 @@ export default class MenuView {
         <input type="radio" name="control" id="control__statistic" class="control__input visually-hidden" />
         <label for="control__statistic" class="control__label">STATISTICS</label>
       </section>`;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

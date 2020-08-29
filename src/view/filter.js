@@ -1,4 +1,4 @@
-import {createElement} from '../utils';
+import AbstractView from './abstract';
 
 const getFilterItemTemplate = (filterItem, isChecked) => {
   const {title, count} = filterItem;
@@ -10,27 +10,15 @@ const getFilterItemTemplate = (filterItem, isChecked) => {
     </label>`;
 };
 
-export default class FilterView {
+export default class FilterView extends AbstractView {
   constructor(filter) {
-    this._element = null;
+    super();
     this._filter = filter;
-  }
-
-  get element() {
-    if (!this._element) {
-      this._element = createElement(this.template);
-    }
-
-    return this._element;
   }
 
   get template() {
     return `<section class="main__filter filter container">
         ${this._filter.map((filterItem, i) => getFilterItemTemplate(filterItem, i === 0)).join(``)}
       </section>`;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
