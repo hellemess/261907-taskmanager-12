@@ -18,7 +18,9 @@ export const createElement = (template) => {
 const getElement = (element) => element instanceof AbstractView ? element.element : element;
 
 export const remove = (component) => {
-  if (!(component instanceof AbstractView)) {
+  const isAbstractView = component instanceof AbstractView;
+
+  if (!isAbstractView) {
     throw new Error(`Can’t remove anything that is not a component.`);
   }
 

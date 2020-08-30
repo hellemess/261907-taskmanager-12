@@ -23,7 +23,9 @@ export default class BoardPresenter {
   _renderBoard() {
     render(this._container, this._board, RenderPosition.BEFOREEND);
 
-    if (this._tasks.every((task) => task.isArchive)) {
+    const isEverythingArchived = this._tasks.every((task) => task.isArchive);
+
+    if (isEverythingArchived) {
       this._renderNoTasks();
 
       return;
