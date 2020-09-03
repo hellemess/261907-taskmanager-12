@@ -1,9 +1,10 @@
-import {KeyCodes} from '../const';
+import {KeyCodes, SortTypes} from '../const';
 import BoardView from '../view/board';
 import TasksListView from '../view/tasks-list';
 import LoadButtonView from '../view/load-button';
-import {RenderPosition, remove, render, replace} from '../utils/render';
 import SortingView from '../view/sorting';
+import {sortTasksDateDown, sortTasksDateUp} from '../utils/task';
+import {RenderPosition, remove, render, replace} from '../utils/render';
 import TaskEditView from '../view/task-edit';
 import TaskView from '../view/task';
 import NoTaskView from '../view/no-task';
@@ -16,8 +17,27 @@ export default class BoardPresenter {
     this._board = new BoardView();
     this._tasksList = new TasksListView();
     this._loadButton = new LoadButtonView();
+    this._sorting = new SortingView();
     this._renderedTasksCount = TASKS_COUNT_PER_STEP;
+    this._currentSortType = SortTypes.DEFAULT;
     this._renderMoreTasks = this._renderMoreTasks.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+  }
+
+  _clearTasksList() {
+    this._tasksList.element.innerHTML = ``;
+    this._renderedTasksCount = TASKS_COUNT_PER_STEP;
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (sortType === this._currentSortType) {
+      return;
+    }
+
+    this._currentSortType = sortType;
+    this._sortTasks(this._currentSortType);
+    this._clearTasksList();
+    this._renderTasksList();
   }
 
   _renderBoard() {
@@ -54,7 +74,8 @@ export default class BoardPresenter {
   }
 
   _renderSorting() {
-    render(this._board, new SortingView(), RenderPosition.BEFOREEND);
+    render(this._board, this._sorting, RenderPosition.BEFOREEND);
+    this._sorting.sortTypeChangeHandler = this._handleSortTypeChange;
   }
 
   _renderTask(task) {
@@ -105,8 +126,22 @@ export default class BoardPresenter {
     }
   }
 
+  _sortTasks(sortType) {
+    switch (sortType) {
+      case SortTypes.DATE_DOWN:
+        this._tasks = this._tasks.sort(sortTasksDateDown);
+        break;
+      case SortTypes.DATE_UP:
+        this._tasks = this._tasks.sort(sortTasksDateUp);
+        break;
+      default:
+        this._tasks = this._originalTasks;
+    }
+  }
+
   init(tasks) {
     this._tasks = tasks.slice();
+    this._originalTasks = this._tasks.slice();
     this._renderBoard();
   }
 }
